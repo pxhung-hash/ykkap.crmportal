@@ -4,7 +4,7 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Checkbox } from "./ui/checkbox";
-import logoImage from "figma:asset/1996c60364a36937d12f35eaa51d4f848d59fb2b.png";
+
 
 interface LoginPageProps {
   onLogin: (email: string, password: string) => void;
