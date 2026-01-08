@@ -16,7 +16,7 @@ import {
   FileText,
   CheckCircle
 } from "lucide-react";
-import exampleImage from 'figma:asset/87bd3445bc75b11be1b1dd74f756b0a1eaa6f813.png';
+
 import { OuterBOMDetail } from "./OuterBOMDetail";
 import { InnerBOMDetail } from "./InnerBOMDetail";
 import { AddNewBOM } from "./AddNewBOM";
