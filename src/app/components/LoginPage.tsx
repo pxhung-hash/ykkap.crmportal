@@ -87,7 +87,7 @@ export function LoginPage({ onLogin, onSwitchToAdmin }: LoginPageProps) {
         <Card className="shadow-2xl border-0">
           <CardHeader className="space-y-1 pb-6">
             <div className="lg:hidden flex items-center justify-center gap-3 mb-4">
-              <img src={logoImage} alt="YKK AP" className="h-24 w-auto" />
+              <img src="http://via.placeholder.com/150" alt="YKK AP" className="h-24 w-auto" />
               <div>
                 <h1 className="text-xl font-bold text-gray-900">YKK AP</h1>
                 <p className="text-sm text-gray-600">Dealer Portal</p>
