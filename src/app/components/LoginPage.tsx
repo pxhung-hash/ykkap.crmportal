@@ -27,7 +27,7 @@ export function LoginPage({ onLogin, onSwitchToAdmin }: LoginPageProps) {
         {/* Left side - Branding */}
         <div className="hidden lg:block space-y-6">
           <div className="flex items-center gap-4">
-            <img src={logoImage} alt="YKK AP" className="h-32 w-auto" />
+            <img src="http://via.placeholder.com/150" alt="YKK AP" className="h-32 w-auto" />
             <div>
               <h1 className="text-2xl font-bold text-gray-900">YKK AP</h1>
               <p className="text-lg text-gray-600">Dealer Portal</p>
