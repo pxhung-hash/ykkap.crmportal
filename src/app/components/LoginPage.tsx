@@ -27,7 +27,7 @@ export function LoginPage({ onLogin, onSwitchToAdmin }: LoginPageProps) {
         {/* Left side - Branding */}
         <div className="hidden lg:block space-y-6">
           <div className="flex items-center gap-4">
-            <img src="http://via.placeholder.com/150" alt="YKK AP" className="h-32 w-auto" />
+            <img src="https://ykkap.vn/assets/img/header_logo01.svg" alt="YKK AP" className="h-32 w-auto" />
             <div>
               <h1 className="text-2xl font-bold text-gray-900">YKK AP</h1>
               <p className="text-lg text-gray-600">Dealer Portal</p>
@@ -87,7 +87,7 @@ export function LoginPage({ onLogin, onSwitchToAdmin }: LoginPageProps) {
         <Card className="shadow-2xl border-0">
           <CardHeader className="space-y-1 pb-6">
             <div className="lg:hidden flex items-center justify-center gap-3 mb-4">
-              <img src="http://via.placeholder.com/150" alt="YKK AP" className="h-24 w-auto" />
+              <img src="https://ykkap.vn/assets/img/header_logo01.svg" alt="YKK AP" className="h-24 w-auto" />
               <div>
                 <h1 className="text-xl font-bold text-gray-900">YKK AP</h1>
                 <p className="text-sm text-gray-600">Dealer Portal</p>
