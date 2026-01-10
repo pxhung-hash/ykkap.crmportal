@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import logoImage from "ykkap.crmportal/src/assets/YKK AP Logo.png";
+import logoImage from "../../assets/Logo.png";
 
 interface HeaderProps {
   onLogout: () => void;
