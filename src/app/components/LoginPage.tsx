@@ -5,7 +5,7 @@ import { Label } from "./ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Checkbox } from "./ui/checkbox";
 import { UserSetup } from "./UserSetup";
-import logoImage from "../../assets/YKK AP Logo.png";
+import logoImage from "../../assets/Logo.png";
 
 interface LoginPageProps {
   onLogin: (email: string, password: string) => void;
