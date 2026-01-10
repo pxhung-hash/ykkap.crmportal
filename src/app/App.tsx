@@ -19,6 +19,9 @@ import { LoginPage } from "./components/LoginPage";
 import { SystemAdminLogin } from "./components/SystemAdminLogin";
 import { ProfileSetup, ProfileData } from "./components/ProfileSetup";
 import { projectId, publicAnonKey } from "../../utils/supabase/info";
+import { auth } from "./utils/supabaseHelpers";
+import { supabase } from "./utils/supabaseClient";
+import type { UserRole } from "./types/database.types";
 
 // CRM Portal Application
 export default function App() {
@@ -26,10 +29,52 @@ export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [hasProfile, setHasProfile] = useState(false);
   const [userEmail, setUserEmail] = useState("");
-  const [userRole, setUserRole] = useState<"admin" | "dealer" | "sales" | "viewer">("dealer");
+  const [userRole, setUserRole] = useState<UserRole>("Dealer");
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
   const [loginMode, setLoginMode] = useState<"dealer" | "admin">("dealer");
+  const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState<string | null>(null);
+
+  // Check for existing session on mount
+  useEffect(() => {
+    checkSession();
+  }, []);
+
+  const checkSession = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session?.user) {
+        // User is logged in, get their profile
+        const profile = await auth.getCurrentUserProfile();
+        
+        if (profile) {
+          setIsLoggedIn(true);
+          setHasProfile(true);
+          setUserEmail(profile.email);
+          setUserRole(profile.role);
+          setUserId(profile.id);
+          
+          // Map profile data if exists
+          if (profile.full_name || profile.phone) {
+            setProfileData({
+              fullName: profile.full_name || "",
+              company: profile.company_name || "",
+              phone: profile.phone || "",
+              country: "",
+              city: "",
+              address: "",
+            });
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error checking session:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Load email server settings after login
   useEffect(() => {
@@ -67,23 +112,60 @@ export default function App() {
     }
   };
 
-  const handleLogin = (email: string, password: string) => {
-    // Simple login logic - in production this would validate against a backend
-    if (email && password) {
-      setIsLoggedIn(true);
-      setUserEmail(email);
-      setHasProfile(true); // Skip profile setup and go directly to main page
+  const handleLogin = async (email: string, password: string) => {
+    try {
+      setLoading(true);
       
-      // Determine user role based on email (in production, this would come from the backend)
-      if (email.includes("admin")) {
-        setUserRole("admin");
-      } else if (email.includes("sales")) {
-        setUserRole("sales");
-      } else if (email.includes("dealer")) {
-        setUserRole("dealer");
-      } else {
-        setUserRole("dealer"); // Default to dealer role
+      // Sign in with Supabase
+      const { user } = await auth.signIn(email, password);
+      
+      if (user) {
+        // Get user profile from database
+        const profile = await auth.getCurrentUserProfile();
+        
+        if (profile) {
+          setIsLoggedIn(true);
+          setHasProfile(true);
+          setUserEmail(profile.email);
+          setUserRole(profile.role);
+          setUserId(profile.id);
+          
+          // Map profile data if exists
+          if (profile.full_name || profile.phone) {
+            setProfileData({
+              fullName: profile.full_name || "",
+              company: profile.company_name || "",
+              phone: profile.phone || "",
+              country: "",
+              city: "",
+              address: "",
+            });
+          }
+          
+          console.log("Login successful:", { email: profile.email, role: profile.role });
+        } else {
+          throw new Error("User profile not found. Please contact administrator.");
+        }
       }
+    } catch (error: any) {
+      console.error("Login error:", error);
+      
+      // Provide helpful error messages
+      let errorMessage = "Login failed. Please check your credentials.";
+      
+      if (error.message?.includes("Invalid login credentials")) {
+        errorMessage = "Invalid email or password. If you haven't created an account yet, click 'Create Test Users' on the login page.";
+      } else if (error.message?.includes("Email not confirmed")) {
+        errorMessage = "Please confirm your email address before logging in.";
+      } else if (error.message?.includes("User not found")) {
+        errorMessage = "No account found with this email. Please create an account first using the 'Create Test Users' button.";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      alert(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -92,13 +174,19 @@ export default function App() {
     setHasProfile(true);
   };
 
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    setHasProfile(false);
-    setUserEmail("");
-    setUserRole("dealer");
-    setProfileData(null);
-    setSelectedProductId(null);
+  const handleLogout = async () => {
+    try {
+      await auth.signOut();
+      setIsLoggedIn(false);
+      setHasProfile(false);
+      setUserEmail("");
+      setUserRole("Dealer");
+      setProfileData(null);
+      setUserId(null);
+      setActiveTab("dashboard");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
   };
 
   const handleViewProduct = (productId: number) => {
@@ -108,6 +196,18 @@ export default function App() {
   const handleBackToCatalog = () => {
     setSelectedProductId(null);
   };
+
+  // Show loading spinner while checking session
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Show login page if not logged in
   if (!isLoggedIn) {
@@ -139,7 +239,7 @@ export default function App() {
     }
 
     // Access control: Prevent dealers from accessing admin and user management pages
-    if (userRole === "dealer" && (activeTab === "admin" || activeTab === "users")) {
+    if (userRole === "Dealer" && (activeTab === "admin" || activeTab === "users")) {
       return (
         <div className="bg-white rounded-lg shadow-sm p-8 text-center">
           <div className="max-w-md mx-auto">

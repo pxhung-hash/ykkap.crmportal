@@ -4,7 +4,8 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Checkbox } from "./ui/checkbox";
-
+import { UserSetup } from "./UserSetup";
+import logoImage from "figma:asset/1996c60364a36937d12f35eaa51d4f848d59fb2b.png";
 
 interface LoginPageProps {
   onLogin: (email: string, password: string) => void;
@@ -15,6 +16,7 @@ export function LoginPage({ onLogin, onSwitchToAdmin }: LoginPageProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [showUserSetup, setShowUserSetup] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,11 +25,20 @@ export function LoginPage({ onLogin, onSwitchToAdmin }: LoginPageProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center p-4">
+      {showUserSetup && (
+        <UserSetup 
+          onClose={() => setShowUserSetup(false)} 
+          onUserCreated={() => {
+            // Optionally close the modal after creating users
+          }}
+        />
+      )}
+      
       <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
         {/* Left side - Branding */}
         <div className="hidden lg:block space-y-6">
           <div className="flex items-center gap-4">
-            <img src="https://ykkap.vn/assets/img/header_logo01.svg" alt="YKK AP" className="h-32 w-auto" />
+            <img src={logoImage} alt="YKK AP" className="h-32 w-auto" />
             <div>
               <h1 className="text-2xl font-bold text-gray-900">YKK AP</h1>
               <p className="text-lg text-gray-600">Dealer Portal</p>
@@ -87,7 +98,7 @@ export function LoginPage({ onLogin, onSwitchToAdmin }: LoginPageProps) {
         <Card className="shadow-2xl border-0">
           <CardHeader className="space-y-1 pb-6">
             <div className="lg:hidden flex items-center justify-center gap-3 mb-4">
-              <img src="https://ykkap.vn/assets/img/header_logo01.svg" alt="YKK AP" className="h-24 w-auto" />
+              <img src={logoImage} alt="YKK AP" className="h-24 w-auto" />
               <div>
                 <h1 className="text-xl font-bold text-gray-900">YKK AP</h1>
                 <p className="text-sm text-gray-600">Dealer Portal</p>
@@ -146,6 +157,18 @@ export function LoginPage({ onLogin, onSwitchToAdmin }: LoginPageProps) {
               <Button type="submit" className="w-full">
                 Sign In
               </Button>
+              
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setShowUserSetup(true)}
+                className="w-full border-blue-200 text-blue-600 hover:bg-blue-50"
+              >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                </svg>
+                Create Test Users
+              </Button>
 
               <div className="relative my-6">
                 <div className="absolute inset-0 flex items-center">
@@ -192,6 +215,21 @@ export function LoginPage({ onLogin, onSwitchToAdmin }: LoginPageProps) {
                   <p>• <strong>Dealer:</strong> Use email with "dealer" (e.g., dealer@company.com)</p>
                   <p>• <strong>Sales:</strong> Use email with "sales" (e.g., sales@ykkap.com)</p>
                   <p className="text-blue-600 mt-2">Note: Dealers cannot access Admin Backend & User Management</p>
+                </div>
+              </div>
+              
+              <div className="mt-4 p-4 bg-amber-50 rounded-lg border border-amber-200">
+                <div className="flex items-start gap-3">
+                  <svg className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <div>
+                    <p className="text-xs font-semibold text-amber-900 mb-1">First Time Setup</p>
+                    <p className="text-xs text-amber-700">
+                      Click <strong>"Create Test Users"</strong> above to create demo accounts before logging in. 
+                      You only need to do this once!
+                    </p>
+                  </div>
                 </div>
               </div>
 

@@ -2,6 +2,8 @@ import { Hono } from "npm:hono";
 import { cors } from "npm:hono/cors";
 import { logger } from "npm:hono/logger";
 import * as kv from "./kv_store.tsx";
+import { createClient } from "npm:@supabase/supabase-js@2";
+
 const app = new Hono();
 
 // Enable logger
@@ -22,6 +24,131 @@ app.use(
 // Health check endpoint
 app.get("/make-server-04d82a51/health", (c) => {
   return c.json({ status: "ok" });
+});
+
+// ============ USER AUTHENTICATION ENDPOINTS ============
+
+// Sign up new user
+app.post("/make-server-04d82a51/signup", async (c) => {
+  try {
+    const body = await c.req.json();
+    const { email, password, full_name, role, phone, company } = body;
+
+    if (!email || !password) {
+      return c.json({ 
+        success: false, 
+        error: "Email and password are required" 
+      }, 400);
+    }
+
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+    );
+
+    // Create user in Supabase Auth
+    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true, // Auto-confirm email since email server hasn't been configured
+      user_metadata: {
+        full_name: full_name || '',
+        role: role || 'Dealer',
+      },
+    });
+
+    if (authError) {
+      console.error("Auth error during signup:", authError);
+      return c.json({ 
+        success: false, 
+        error: `Authentication error: ${authError.message}` 
+      }, 400);
+    }
+
+    if (!authData.user) {
+      return c.json({ 
+        success: false, 
+        error: "No user returned from signup" 
+      }, 400);
+    }
+
+    // Create user profile in database
+    const { data: profileData, error: profileError } = await supabase
+      .from('users')
+      .insert({
+        id: authData.user.id,
+        email,
+        full_name: full_name || '',
+        role: role || 'Dealer',
+        phone: phone || null,
+        company: company || null,
+      })
+      .select()
+      .single();
+
+    if (profileError) {
+      console.error("Profile creation error during signup:", profileError);
+      // Try to clean up the auth user if profile creation fails
+      await supabase.auth.admin.deleteUser(authData.user.id);
+      return c.json({ 
+        success: false, 
+        error: `Profile creation error: ${profileError.message}` 
+      }, 400);
+    }
+
+    console.log(`User created successfully: ${email} (${role})`);
+
+    return c.json({ 
+      success: true, 
+      message: "User created successfully",
+      user: {
+        id: authData.user.id,
+        email,
+        role: profileData.role,
+        full_name: profileData.full_name,
+      }
+    });
+  } catch (error: any) {
+    console.error("Error during signup:", error);
+    return c.json({ 
+      success: false, 
+      error: error.message || "Signup failed" 
+    }, 500);
+  }
+});
+
+// Get all users (Admin only - for user management)
+app.get("/make-server-04d82a51/users", async (c) => {
+  try {
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+    );
+
+    const { data, error } = await supabase
+      .from('users')
+      .select('id, email, full_name, role, phone, company, created_at')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error("Error fetching users:", error);
+      return c.json({ 
+        success: false, 
+        error: error.message 
+      }, 500);
+    }
+
+    return c.json({ 
+      success: true, 
+      users: data || [] 
+    });
+  } catch (error: any) {
+    console.error("Error fetching users:", error);
+    return c.json({ 
+      success: false, 
+      error: error.message 
+    }, 500);
+  }
 });
 
 // Save quotation draft

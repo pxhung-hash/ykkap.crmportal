@@ -14,30 +14,31 @@ import {
   Calculator
 } from "lucide-react";
 import { Button } from "./ui/button";
+import type { UserRole } from "../types/database.types";
 
 interface SidebarProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
-  userRole?: "admin" | "dealer" | "sales" | "viewer";
+  userRole?: UserRole;
 }
 
 const menuItems = [
-  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, allowedRoles: ["admin", "dealer", "sales", "viewer"] },
-  { id: "products", label: "Product Catalog", icon: Package, allowedRoles: ["admin", "dealer", "sales", "viewer"] },
-  { id: "orders", label: "Orders", icon: ShoppingCart, allowedRoles: ["admin", "dealer", "sales", "viewer"] },
-  { id: "quotation", label: "Quotation", icon: FileInput, allowedRoles: ["admin", "dealer", "sales", "viewer"] },
-  { id: "windowQuotation", label: "Window Quotation", icon: Calculator, allowedRoles: ["admin", "dealer", "sales", "viewer"] },
-  { id: "materials", label: "Material Catalog", icon: Layers, allowedRoles: ["admin", "dealer", "sales", "viewer"] },
-  { id: "inventory", label: "Inventory", icon: Boxes, allowedRoles: ["admin", "dealer", "sales", "viewer"] },
-  { id: "documents", label: "Documents", icon: FileText, allowedRoles: ["admin", "dealer", "sales", "viewer"] },
-  { id: "messages", label: "Messages", icon: MessageSquare, allowedRoles: ["admin", "dealer", "sales", "viewer"] },
-  { id: "analytics", label: "Analytics", icon: BarChart3, allowedRoles: ["admin", "dealer", "sales", "viewer"] },
-  { id: "users", label: "User Management", icon: Users, allowedRoles: ["admin", "sales"] },
-  { id: "settings", label: "Settings", icon: Settings, allowedRoles: ["admin", "dealer", "sales", "viewer"] },
-  { id: "admin", label: "Admin Backend", icon: Shield, allowedRoles: ["admin", "sales"] },
+  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, allowedRoles: ["Admin", "Dealer", "Sales", "Viewer"] as UserRole[] },
+  { id: "products", label: "Product Catalog", icon: Package, allowedRoles: ["Admin", "Dealer", "Sales", "Viewer"] as UserRole[] },
+  { id: "orders", label: "Orders", icon: ShoppingCart, allowedRoles: ["Admin", "Dealer", "Sales", "Viewer"] as UserRole[] },
+  { id: "quotation", label: "Quotation", icon: FileInput, allowedRoles: ["Admin", "Dealer", "Sales", "Viewer"] as UserRole[] },
+  { id: "windowQuotation", label: "Window Quotation", icon: Calculator, allowedRoles: ["Admin", "Dealer", "Sales", "Viewer"] as UserRole[] },
+  { id: "materials", label: "Material Catalog", icon: Layers, allowedRoles: ["Admin", "Dealer", "Sales", "Viewer"] as UserRole[] },
+  { id: "inventory", label: "Inventory", icon: Boxes, allowedRoles: ["Admin", "Dealer", "Sales", "Viewer"] as UserRole[] },
+  { id: "documents", label: "Documents", icon: FileText, allowedRoles: ["Admin", "Dealer", "Sales", "Viewer"] as UserRole[] },
+  { id: "messages", label: "Messages", icon: MessageSquare, allowedRoles: ["Admin", "Dealer", "Sales", "Viewer"] as UserRole[] },
+  { id: "analytics", label: "Analytics", icon: BarChart3, allowedRoles: ["Admin", "Dealer", "Sales", "Viewer"] as UserRole[] },
+  { id: "users", label: "User Management", icon: Users, allowedRoles: ["Admin", "Sales"] as UserRole[] },
+  { id: "settings", label: "Settings", icon: Settings, allowedRoles: ["Admin", "Dealer", "Sales", "Viewer"] as UserRole[] },
+  { id: "admin", label: "Admin Backend", icon: Shield, allowedRoles: ["Admin", "Sales"] as UserRole[] },
 ];
 
-export function Sidebar({ activeTab, onTabChange, userRole = "dealer" }: SidebarProps) {
+export function Sidebar({ activeTab, onTabChange, userRole = "Dealer" }: SidebarProps) {
   // Filter menu items based on user role
   const visibleMenuItems = menuItems.filter((item) =>
     item.allowedRoles.includes(userRole)

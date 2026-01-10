@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-
+import logoImage from "figma:asset/1996c60364a36937d12f35eaa51d4f848d59fb2b.png";
 
 interface HeaderProps {
   onLogout: () => void;
@@ -21,7 +21,7 @@ export function Header({ onLogout }: HeaderProps) {
       <div className="flex items-center justify-between px-6 py-4">
         <div className="flex items-center gap-8">
           <div className="flex items-center gap-3">
-            <img src="https://ykkap.vn/assets/img/header_logo01.svg" alt="YKK AP" className="h-24 w-auto" />
+            <img src={logoImage} alt="YKK AP" className="h-24 w-auto" />
             <div>
               <h1 className="text-xl font-bold text-gray-900">YKK AP</h1>
               <p className="text-sm text-gray-600">Dealer Portal</p>
